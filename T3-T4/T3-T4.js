@@ -91,18 +91,59 @@ i l'ús de blocs then() a JavaScript:
   */
 
 //1 modifyPageNumberInput
-    function modifyPageNumberInput(){
+    function modifyPageNumberInput() {
         //Put your code here
+        document.getElementById("pageNumber").addEventListener("change", function() {
+            fetchSWAPIPeople(document.getElementById("pageNumber").value);
+        });
     }
 
     //2 fetchSWAPIPeople
     function fetchSWAPIPeople(pageNumber) {
         //Put your code here
+        document.getElementById("myContent").classList.add("hidden");
+
+        document.getElementById("loader").classList.remove("hidden");
+
+        document.getElementById("loading-text").textContent = "loading...";
+
+        fetch("https://swapi.dev/api/people/?page=" + pageNumber)
+            .then(function(response) {
+                localStorage.setItem("swapi_" + pageNumber, response);
+
+                return response.json();
+            })
+            .then(function(data) {
+                const select = document.createElement("select");
+
+                data.results.forEach(function(character) {
+                    const option = document.createElement("option");
+                    option.text = character.name;
+                    option.value = character.url;
+                    select.appendChild(option);
+                });
+
+                document.getElementById("selectContainer").innerHTML = "";
+                document.getElementById("selectContainer").appendChild(select);
+
+                document.getElementById("loader").classList.add("hidden");
+
+                document.getElementById("myContent").classList.remove("hidden");
+
+                select.addEventListener("change", function() {
+                    document.getElementById("myContent").action = select.value;
+                });
+            });        
+
     }
 
     // 3 modifySendFormButton
     function modifySendFormButton(){
         //Put your code here
+        document.getElementById("sendForm").addEventListener("click", function(event) {
+            event.preventDefault();
+            window.open(document.getElementById("myContent").action);
+        });
     }
 /**
  *  Do not modify this DOMContentLoaded script
